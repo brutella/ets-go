@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"strings"
 )
 
 func getNamespace(start xml.StartElement) string {
@@ -34,7 +35,7 @@ func (pi *ProjectInfo) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace, schema12Namespace, schema13Namespace:
+	case schema11Namespace, schema12Namespace, schema13Namespace, schema20Namespace:
 		return d.DecodeElement((*projectInfo11)(pi), &start)
 
 	default:
@@ -61,11 +62,35 @@ type Connector struct {
 // ComObjectRefID is the ID of a communication object reference.
 type ComObjectRefID string
 
+func (s ComObjectRefID) InstanceID() string {
+	com := strings.Split(string(s), "_")
+	if len(com) == 4 {
+		return com[3]
+	}
+
+	return ""
+}
+
+// IDs returns the manfucturer, applicaton program, communication object and communcation object reference ids.
+func (s ComObjectRefID) IDs() (m string, ap string, o string, r string) {
+	com := strings.Split(string(s), "_")
+	if len(com) == 4 {
+		m = com[0]
+		ap = com[1]
+		o = com[2]
+		r = com[3]
+	}
+
+	return
+}
+
 // ComObjectInstanceRef connects a communication object reference with zero or more group addresses.
 type ComObjectInstanceRef struct {
-	RefID         ComObjectRefID
-	DatapointType string
-	Connectors    []Connector
+	ComObjectRefID ComObjectRefID
+	ComObjectID    ComObjectID
+	DatapointType  string
+	Connectors     []Connector
+	Links          []string
 }
 
 // DeviceInstanceID is the ID of a device instance.
@@ -73,10 +98,15 @@ type DeviceInstanceID string
 
 // DeviceInstance is a device instance.
 type DeviceInstance struct {
-	ID         DeviceInstanceID
-	Name       string
-	Address    uint
-	ComObjects []ComObjectInstanceRef
+	ID                 DeviceInstanceID
+	ProjectID          ProjectID
+	ManufacturerID     ManufacturerID
+	HardwareID         HardwareID
+	ProductID          ProductID
+	Hardware2ProgramID Hardware2ProgramID
+	Name               string
+	Address            uint16
+	ComObjects         []ComObjectInstanceRef
 }
 
 // LineID is the ID of a line.
@@ -86,7 +116,7 @@ type LineID string
 type Line struct {
 	ID      LineID
 	Name    string
-	Address uint
+	Address uint16
 	Devices []DeviceInstance
 }
 
@@ -97,7 +127,7 @@ type AreaID string
 type Area struct {
 	ID      AreaID
 	Name    string
-	Address uint
+	Address uint16
 	Lines   []Line
 }
 
@@ -106,9 +136,10 @@ type GroupAddressID string
 
 // GroupAddress is a group address.
 type GroupAddress struct {
-	ID      GroupAddressID
-	Name    string
-	Address uint
+	ID        GroupAddressID
+	ProjectID ProjectID
+	Name      string
+	Address   uint16
 }
 
 // GroupRangeID is the ID of a group range.
@@ -118,8 +149,8 @@ type GroupRangeID string
 type GroupRange struct {
 	ID         GroupRangeID
 	Name       string
-	RangeStart uint
-	RangeEnd   uint
+	RangeStart uint16
+	RangeEnd   uint16
 	Addresses  []GroupAddress
 	SubRanges  []GroupRange
 }
@@ -145,6 +176,9 @@ func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	switch ns {
 	case schema11Namespace, schema12Namespace, schema13Namespace:
 		return d.DecodeElement((*project11)(p), &start)
+
+	case schema20Namespace:
+		return d.DecodeElement((*project20)(p), &start)
 
 	default:
 		return fmt.Errorf("Unexpected namespace '%s'", ns)

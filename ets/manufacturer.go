@@ -14,39 +14,43 @@ type ComObjectID string
 
 // ComObject is a communication object.
 type ComObject struct {
-	ID                ComObjectID
-	Name              string
-	Text              string
-	Description       string
-	FunctionText      string
-	ObjectSize        string
-	DatapointType     string
-	Priority          string
-	ReadFlag          bool
-	WriteFlag         bool
-	CommunicationFlag bool
-	TransmitFlag      bool
-	UpdateFlag        bool
-	ReadOnInitFlag    bool
+	ID                   ComObjectID
+	ApplicationProgramID ApplicationProgramID
+	ManufacturerID       ManufacturerID
+	Name                 string
+	Text                 string
+	Description          string
+	FunctionText         string
+	ObjectSize           string
+	DatapointType        string
+	Priority             string
+	ReadFlag             bool
+	WriteFlag            bool
+	CommunicationFlag    bool
+	TransmitFlag         bool
+	UpdateFlag           bool
+	ReadOnInitFlag       bool
 }
 
 // ComObjectRef is an instance/reference to a communication object.
 type ComObjectRef struct {
-	ID                ComObjectRefID
-	RefID             ComObjectID
-	Name              *string
-	Text              *string
-	Description       *string
-	FunctionText      *string
-	ObjectSize        *string
-	DatapointType     *string
-	Priority          *string
-	ReadFlag          *bool
-	WriteFlag         *bool
-	CommunicationFlag *bool
-	TransmitFlag      *bool
-	UpdateFlag        *bool
-	ReadOnInitFlag    *bool
+	ID                   ComObjectRefID
+	ComObjectID          ComObjectID
+	ApplicationProgramID ApplicationProgramID
+	ManufacturerID       ManufacturerID
+	Name                 *string
+	Text                 *string
+	Description          *string
+	FunctionText         *string
+	ObjectSize           *string
+	DatapointType        *string
+	Priority             *string
+	ReadFlag             *bool
+	WriteFlag            *bool
+	CommunicationFlag    *bool
+	TransmitFlag         *bool
+	UpdateFlag           *bool
+	ReadOnInitFlag       *bool
 }
 
 // ApplicationProgramID is the ID of an application program.
@@ -54,11 +58,12 @@ type ApplicationProgramID string
 
 // ApplicationProgram is an application program.
 type ApplicationProgram struct {
-	ID         ApplicationProgramID
-	Name       string
-	Version    uint
-	Objects    []ComObject
-	ObjectRefs []ComObjectRef
+	ID             ApplicationProgramID
+	ManufacturerID ManufacturerID
+	Name           string
+	Version        uint
+	Objects        []ComObject
+	ObjectRefs     []ComObjectRef
 }
 
 // ManufacturerID is the ID of a manufacturer.
@@ -66,8 +71,8 @@ type ManufacturerID string
 
 // ManufacturerData contains manufacturer-specific data.
 type ManufacturerData struct {
-	Manufacturer ManufacturerID
-	Programs     []ApplicationProgram
+	ID       ManufacturerID
+	Programs []ApplicationProgram
 }
 
 // UnmarshalXML implements xml.Unmarshaler.
@@ -75,7 +80,7 @@ func (md *ManufacturerData) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace, schema12Namespace, schema13Namespace:
+	case schema11Namespace, schema12Namespace, schema13Namespace, schema20Namespace:
 		return d.DecodeElement((*manufacturerData11)(md), &start)
 
 	default:
