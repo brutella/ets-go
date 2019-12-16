@@ -23,11 +23,20 @@ func getNamespace(start xml.StartElement) string {
 // ProjectID is a project identifier.
 type ProjectID string
 
+type GroupAddressStyle int
+
+const (
+	GroupAddressStyleThree GroupAddressStyle = iota
+	GroupAddressStyleTwo
+	GroupAddressStyleFree
+)
+
 // ProjectInfo contains project information. These information are usually stored in
 // the P-XXXX/Project.xml file.
 type ProjectInfo struct {
-	ID   ProjectID
-	Name string
+	ID           ProjectID
+	Name         string
+	AddressStyle GroupAddressStyle
 }
 
 // UnmarshalXML implements xml.Unmarshaler.

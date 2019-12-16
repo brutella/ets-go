@@ -18,7 +18,8 @@ func (pi *projectInfo11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		Project struct {
 			ID                 string `xml:"Id,attr"`
 			ProjectInformation struct {
-				Name string `xml:",attr"`
+				Name              string `xml:",attr"`
+				GroupAddressStyle string `xml:",attr"`
 			}
 		}
 	}
@@ -29,6 +30,15 @@ func (pi *projectInfo11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 
 	pi.ID = ProjectID(doc.Project.ID)
 	pi.Name = doc.Project.ProjectInformation.Name
+
+	switch doc.Project.ProjectInformation.GroupAddressStyle {
+	case "ThreeLevel":
+		pi.AddressStyle = GroupAddressStyleThree
+	case "TwoLevel":
+		pi.AddressStyle = GroupAddressStyleTwo
+	default:
+		pi.AddressStyle = GroupAddressStyleFree
+	}
 
 	return nil
 }
