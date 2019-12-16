@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/vapourismo/ets-go.svg?branch=master)](https://travis-ci.org/vapourismo/ets-go)
-[![GoDoc](https://godoc.org/github.com/vapourismo/ets-go?status.svg)](https://godoc.org/github.com/vapourismo/ets-go)
+[![Build Status](https://travis-ci.org/brutella/ets-go.svg?branch=master)](https://travis-ci.org/brutella/ets-go)
+[![GoDoc](https://godoc.org/github.com/brutella/ets-go?status.svg)](https://godoc.org/github.com/brutella/ets-go)
 
 # ets-go
 
