@@ -1,4 +1,4 @@
-module github.com/vapourismo/ets-go
+module github.com/brutella/ets-go
 
 go 1.13
 
