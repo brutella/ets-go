@@ -55,13 +55,21 @@ func (di *deviceInstance20) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 
 	for n, docComObj := range doc.ComObjects {
 		ids := strings.Split(docComObj.RefID, "_")
-		if len(ids) != 2 {
+		var comObjID ComObjectID
+		var comObjRefID ComObjectRefID
+		if len(ids) == 2 {
+			comObjID = ComObjectID(ids[0])
+			comObjRefID = ComObjectRefID(ids[1])
+		} else if len(ids) == 4 {
+			comObjID = ComObjectID(ids[2])
+			comObjRefID = ComObjectRefID(ids[3])
+		} else {
 			return fmt.Errorf("Invalid ComObjectInstanceRefId %s", docComObj.RefID)
 		}
 
 		comObj := ComObjectInstanceRef{
-			ComObjectID:    ComObjectID(ids[0]),
-			ComObjectRefID: ComObjectRefID(ids[1]),
+			ComObjectID:    comObjID,
+			ComObjectRefID: comObjRefID,
 			DatapointType:  docComObj.DatapointType,
 			Links:          make([]string, 0),
 		}
@@ -136,6 +144,7 @@ func (i *installation20) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		Name        string         `xml:",attr"`
 		Areas       []area20       `xml:"Topology>Area"`
 		GroupRanges []groupRange11 `xml:"GroupAddresses>GroupRanges>GroupRange"`
+		Locations   []space11      `xml:"Locations>Space"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
@@ -145,6 +154,7 @@ func (i *installation20) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	i.Name = doc.Name
 	i.Topology = make([]Area, len(doc.Areas))
 	i.GroupAddresses = make([]GroupRange, len(doc.GroupRanges))
+	i.Locations = make([]Space, len(doc.Locations))
 
 	for n, docArea := range doc.Areas {
 		i.Topology[n] = Area(docArea)
@@ -152,6 +162,10 @@ func (i *installation20) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 
 	for n, docGrpRange := range doc.GroupRanges {
 		i.GroupAddresses[n] = GroupRange(docGrpRange)
+	}
+
+	for n, docSpace := range doc.Locations {
+		i.Locations[n] = Space(docSpace)
 	}
 
 	return nil

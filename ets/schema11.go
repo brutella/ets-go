@@ -19,6 +19,7 @@ func (pi *projectInfo11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 			ID                 string `xml:"Id,attr"`
 			ProjectInformation struct {
 				Name              string `xml:",attr"`
+				Comment           string `xml:",attr"`
 				GroupAddressStyle string `xml:",attr"`
 			}
 		}
@@ -30,6 +31,7 @@ func (pi *projectInfo11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 
 	pi.ID = ProjectID(doc.Project.ID)
 	pi.Name = doc.Project.ProjectInformation.Name
+	pi.Comment = doc.Project.ProjectInformation.Comment
 
 	switch doc.Project.ProjectInformation.GroupAddressStyle {
 	case "ThreeLevel":
@@ -92,15 +94,24 @@ func (di *deviceInstance11) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 
 	for n, docComObj := range doc.ComObjects {
 		ids := strings.Split(docComObj.RefID, "_")
-		if len(ids) != 2 {
+		var comObjID ComObjectID
+		var comObjRefID ComObjectRefID
+		if len(ids) == 2 {
+			comObjID = ComObjectID(ids[0])
+			comObjRefID = ComObjectRefID(ids[1])
+		} else if len(ids) == 4 {
+			comObjID = ComObjectID(ids[2])
+			comObjRefID = ComObjectRefID(ids[3])
+		} else {
 			return fmt.Errorf("Invalid ComObjectInstanceRefId %s", docComObj.RefID)
 		}
 
 		comObj := ComObjectInstanceRef{
-			ComObjectID:    ComObjectID(ids[0]),
-			ComObjectRefID: ComObjectRefID(ids[1]),
+			ComObjectID:    comObjID,
+			ComObjectRefID: comObjRefID,
 			DatapointType:  docComObj.DatapointType,
 			Connectors:     make([]Connector, len(docComObj.Connectors.Elements)),
+			Links:          make([]string, 0),
 		}
 
 		for m, docConnElem := range docComObj.Connectors.Elements {
@@ -169,6 +180,48 @@ func (a *area11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
+type space11 Space
+
+func (sp *space11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var doc struct {
+		ID                string    `xml:"Id,attr"`
+		Name              string    `xml:",attr"`
+		Type              string    `xml:",attr"`
+		SubSpaces         []space11 `xml:"Space"`
+		DeviceInstanceRef []struct {
+			RefID string `xml:"RefId,attr"`
+		}
+	}
+
+	if err := d.DecodeElement(&doc, &start); err != nil {
+		return err
+	}
+
+	ids := strings.Split(doc.ID, "_")
+	if len(ids) == 2 {
+		sp.ProjectID = ProjectID(ids[0])
+		sp.ID = SpaceID(ids[1])
+	}
+
+	sp.Name = doc.Name
+	sp.Type = doc.Type
+	sp.SubSpaces = make([]Space, len(doc.SubSpaces))
+	sp.DeviceInstanceIDs = make([]DeviceInstanceID, len(doc.DeviceInstanceRef))
+
+	for n, docSpace := range doc.SubSpaces {
+		sp.SubSpaces[n] = Space(docSpace)
+	}
+
+	for n, docRef := range doc.DeviceInstanceRef {
+		ids := strings.Split(docRef.RefID, "_")
+		if len(ids) == 2 {
+			sp.DeviceInstanceIDs[n] = DeviceInstanceID(ids[1])
+		}
+	}
+
+	return nil
+}
+
 type groupRange11 GroupRange
 
 func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
@@ -224,6 +277,7 @@ func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		Name        string         `xml:",attr"`
 		Areas       []area11       `xml:"Topology>Area"`
 		GroupRanges []groupRange11 `xml:"GroupAddresses>GroupRanges>GroupRange"`
+		Locations   []space11      `xml:"Locations>Space"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
@@ -233,6 +287,7 @@ func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	i.Name = doc.Name
 	i.Topology = make([]Area, len(doc.Areas))
 	i.GroupAddresses = make([]GroupRange, len(doc.GroupRanges))
+	i.Locations = make([]Space, len(doc.Locations))
 
 	for n, docArea := range doc.Areas {
 		i.Topology[n] = Area(docArea)
@@ -240,6 +295,10 @@ func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 
 	for n, docGrpRange := range doc.GroupRanges {
 		i.GroupAddresses[n] = GroupRange(docGrpRange)
+	}
+
+	for n, docSpace := range doc.Locations {
+		i.Locations[n] = Space(docSpace)
 	}
 
 	return nil

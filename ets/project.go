@@ -36,6 +36,7 @@ const (
 type ProjectInfo struct {
 	ID           ProjectID
 	Name         string
+	Comment      string
 	AddressStyle GroupAddressStyle
 }
 
@@ -164,10 +165,24 @@ type GroupRange struct {
 	SubRanges  []GroupRange
 }
 
+// SpaceID is the ID of a space.
+type SpaceID string
+
+// Space is a space for devices and other spaces.
+type Space struct {
+	ID                SpaceID
+	ProjectID         ProjectID
+	DeviceInstanceIDs []DeviceInstanceID
+	Type              string
+	Name              string
+	SubSpaces         []Space
+}
+
 // Installation is an installation within a project.
 type Installation struct {
 	Name           string
 	Topology       []Area
+	Locations      []Space
 	GroupAddresses []GroupRange
 }
 
@@ -175,6 +190,7 @@ type Installation struct {
 // at P-XXXX/N.xml (0 <= N <= 16).
 type Project struct {
 	ID            ProjectID
+	Name          string
 	Installations []Installation
 }
 

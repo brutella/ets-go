@@ -271,6 +271,11 @@ func Unzip(src string, dest string, pwd func(string) string) ([]string, error) {
 			continue
 		}
 
+		// only copy zip or xml files
+		if !isZipOrXMLFile(fpath) {
+			continue
+		}
+
 		// Make File
 		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
 			return filenames, err
@@ -297,4 +302,9 @@ func Unzip(src string, dest string, pwd func(string) string) ([]string, error) {
 		}
 	}
 	return filenames, nil
+}
+
+func isZipOrXMLFile(path string) bool {
+	ext := filepath.Ext(path)
+	return ext == ".zip" || ext == ".xml"
 }
