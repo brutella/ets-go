@@ -99,7 +99,6 @@ type ComObjectInstanceRef struct {
 	ComObjectRefID ComObjectRefID
 	ComObjectID    ComObjectID
 	DatapointType  string
-	Connectors     []Connector
 	Links          []string
 }
 

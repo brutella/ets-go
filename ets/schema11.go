@@ -106,19 +106,19 @@ func (di *deviceInstance11) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 			return fmt.Errorf("Invalid ComObjectInstanceRefId %s", docComObj.RefID)
 		}
 
+		var links = []string{}
+		for _, docConnElem := range docComObj.Connectors.Elements {
+			ids := strings.Split(docConnElem.RefID, "_")
+			if len(ids) == 2 {
+				links = append(links, ids[1])
+			}
+		}
+
 		comObj := ComObjectInstanceRef{
 			ComObjectID:    comObjID,
 			ComObjectRefID: comObjRefID,
 			DatapointType:  docComObj.DatapointType,
-			Connectors:     make([]Connector, len(docComObj.Connectors.Elements)),
-			Links:          make([]string, 0),
-		}
-
-		for m, docConnElem := range docComObj.Connectors.Elements {
-			comObj.Connectors[m] = Connector{
-				Receive: docConnElem.XMLName.Local == "Receive",
-				RefID:   GroupAddressID(docConnElem.RefID),
-			}
+			Links:          links,
 		}
 
 		di.ComObjects[n] = comObj
