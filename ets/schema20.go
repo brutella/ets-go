@@ -76,7 +76,9 @@ func (di *deviceInstance20) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 
 		links := strings.Split(docComObj.Links, " ")
 		for _, link := range links {
-			comObj.Links = append(comObj.Links, link)
+			if len(link) > 0 {
+				comObj.Links = append(comObj.Links, link)
+			}
 		}
 
 		di.ComObjects[n] = comObj
