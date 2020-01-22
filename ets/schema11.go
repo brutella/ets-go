@@ -109,7 +109,7 @@ func (di *deviceInstance11) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		var links = []string{}
 		for _, docConnElem := range docComObj.Connectors.Elements {
 			ids := strings.Split(docConnElem.RefID, "_")
-			if len(ids) == 2 {
+			if len(ids) == 2 && len(ids[1]) > 0 {
 				links = append(links, ids[1])
 			}
 		}
