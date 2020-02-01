@@ -45,7 +45,7 @@ func (pi *ProjectInfo) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace, schema12Namespace, schema13Namespace, schema20Namespace:
+	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace, schema20Namespace:
 		return d.DecodeElement((*projectInfo11)(pi), &start)
 
 	default:
@@ -198,7 +198,7 @@ func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace, schema12Namespace, schema13Namespace:
+	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace:
 		return d.DecodeElement((*project11)(p), &start)
 
 	case schema20Namespace:
