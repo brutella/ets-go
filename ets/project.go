@@ -1,6 +1,3 @@
-// Copyright 2017 Ole Krüger.
-// Licensed under the MIT license which can be found in the LICENSE file.
-
 package ets
 
 import (
@@ -123,10 +120,11 @@ type LineID string
 
 // Line is a line.
 type Line struct {
-	ID      LineID
-	Name    string
-	Address uint16
-	Devices []DeviceInstance
+	ID        LineID
+	ProjectID ProjectID
+	Name      string
+	Address   uint16
+	Devices   []DeviceInstance
 }
 
 // AreaID is the ID of an area.
@@ -134,10 +132,11 @@ type AreaID string
 
 // Area is an area.
 type Area struct {
-	ID      AreaID
-	Name    string
-	Address uint16
-	Lines   []Line
+	ID        AreaID
+	ProjectID ProjectID
+	Name      string
+	Address   uint16
+	Lines     []Line
 }
 
 // GroupAddressID is the ID of a group address.

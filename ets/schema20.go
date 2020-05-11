@@ -1,6 +1,3 @@
-// Copyright 2017 Ole Krüger.
-// Licensed under the MIT license which can be found in the LICENSE file.
-
 package ets
 
 import (
@@ -57,13 +54,15 @@ func (di *deviceInstance20) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		ids := strings.Split(docComObj.RefID, "_")
 		var comObjID ComObjectID
 		var comObjRefID ComObjectRefID
-		if len(ids) == 2 {
-			comObjID = ComObjectID(ids[0])
-			comObjRefID = ComObjectRefID(ids[1])
-		} else if len(ids) == 4 {
-			comObjID = ComObjectID(ids[2])
-			comObjRefID = ComObjectRefID(ids[3])
-		} else {
+		for _, id := range ids {
+			if strings.HasPrefix(id, "O-") {
+				comObjID = ComObjectID(id)
+			} else if strings.HasPrefix(id, "R-") {
+				comObjRefID = ComObjectRefID(id)
+			}
+		}
+
+		if len(comObjID) == 0 && len(comObjRefID) == 0 {
 			return fmt.Errorf("Invalid ComObjectInstanceRefId %s", docComObj.RefID)
 		}
 
@@ -101,7 +100,12 @@ func (l *line20) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 
-	l.ID = LineID(doc.ID)
+	ids := strings.Split(doc.ID, "_")
+	if len(ids) == 2 {
+		l.ProjectID = ProjectID(ids[0])
+		l.ID = LineID(ids[1])
+	}
+
 	l.Name = doc.Name
 	l.Address = doc.Address
 	l.Devices = make([]DeviceInstance, len(doc.DeviceInstance))
@@ -127,7 +131,11 @@ func (a *area20) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 
-	a.ID = AreaID(doc.ID)
+	ids := strings.Split(doc.ID, "_")
+	if len(ids) == 2 {
+		a.ProjectID = ProjectID(ids[0])
+		a.ID = AreaID(ids[1])
+	}
 	a.Name = doc.Name
 	a.Address = doc.Address
 	a.Lines = make([]Line, len(doc.Line))
