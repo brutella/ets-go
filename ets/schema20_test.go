@@ -109,6 +109,23 @@ func TestVersion5_7_2_743(t *testing.T) {
 										Name:              "Living room",
 										SubSpaces:         []Space{},
 									},
+									Space{
+										ID:                SpaceID("BP-11"),
+										ProjectID:         ProjectID("P-0497-0"),
+										DeviceInstanceIDs: []DeviceInstanceID{},
+										Type:              "Corridor",
+										Name:              "Corridor",
+										SubSpaces: []Space{
+											Space{
+												ID:                SpaceID("BP-13"),
+												ProjectID:         ProjectID("P-0497-0"),
+												DeviceInstanceIDs: []DeviceInstanceID{},
+												Type:              "DistributionBoard",
+												Name:              "Distribution Board",
+												SubSpaces:         []Space{},
+											},
+										},
+									},
 								},
 							},
 							Space{
@@ -135,6 +152,14 @@ func TestVersion5_7_2_743(t *testing.T) {
 										SubSpaces:         []Space{},
 									},
 								},
+							},
+							Space{
+								ID:                SpaceID("BP-12"),
+								ProjectID:         ProjectID("P-0497-0"),
+								DeviceInstanceIDs: []DeviceInstanceID{},
+								Type:              "Stairway",
+								Name:              "Stairway",
+								SubSpaces:         []Space{},
 							},
 						},
 					},

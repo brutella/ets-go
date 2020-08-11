@@ -166,6 +166,16 @@ type GroupRange struct {
 // SpaceID is the ID of a space.
 type SpaceID string
 
+const (
+	SpaceTypeBuilding          = "Building"
+	SpaceTypeBuildingPart      = "BuildingPart"
+	SpaceTypeFloor             = "Floor"
+	SpaceTypeRoom              = "Room"
+	SpaceTypeDistributionBoard = "DistributionBoard"
+	SpaceTypeStairway          = "Stairway"
+	SpaceTypeCorridor          = "Corridor"
+)
+
 // Space is a space for devices and other spaces.
 type Space struct {
 	ID                SpaceID
