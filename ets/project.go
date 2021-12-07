@@ -210,8 +210,11 @@ func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace:
 		return d.DecodeElement((*project11)(p), &start)
 
-	case schema20Namespace, schema21Namespace:
+	case schema20Namespace:
 		return d.DecodeElement((*project20)(p), &start)
+
+	case schema21Namespace:
+		return d.DecodeElement((*project21)(p), &start)
 
 	default:
 		return fmt.Errorf("Unexpected namespace '%s'", ns)

@@ -6,7 +6,7 @@ import (
 )
 
 func TestVersion5_7_2_743(t *testing.T) {
-	archive, err := OpenExportArchive("Testproject-5.7.2-743.knxproj", "")
+	archive, err := OpenExportArchive("Testproject-5.7.5-1373.knxproj", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +62,44 @@ func TestVersion5_7_2_743(t *testing.T) {
 				Address:   1,
 				Lines: []Line{
 					Line{ID: LineID("L-2"), ProjectID: ProjectID("P-0497-0"), Name: "Main line", Address: 0, Devices: []DeviceInstance{}},
-					Line{ID: LineID("L-3"), ProjectID: ProjectID("P-0497-0"), Name: "New line", Address: 1, Devices: []DeviceInstance{}},
+					Line{ID: LineID("L-3"), ProjectID: ProjectID("P-0497-0"), Name: "New line", Address: 1, Devices: []DeviceInstance{
+						DeviceInstance{
+							ID:                 DeviceInstanceID("DI-1"),
+							ProjectID:          ProjectID("P-0497-0"),
+							ManufacturerID:     ManufacturerID("M-0007"),
+							HardwareID:         HardwareID("H-6131.2F20-1"),
+							ProductID:          ProductID("P-6131.2F20"),
+							Hardware2ProgramID: Hardware2ProgramID("HP-3120-32-269B-3120-42-4C77"),
+							Name:               "",
+							Address:            1,
+							ComObjects: []ComObjectInstanceRef{
+								ComObjectInstanceRef{
+									ComObjectRefID: ComObjectRefID("R-1"),
+									ComObjectID:    ComObjectID("O-10"),
+									DatapointType:  "",
+									Links:          []string{"GA-1"},
+								},
+							},
+						},
+						DeviceInstance{
+							ID:                 DeviceInstanceID("DI-2"),
+							ProjectID:          ProjectID("P-0497-0"),
+							ManufacturerID:     ManufacturerID("M-0083"),
+							HardwareID:         HardwareID("H-4-2"),
+							ProductID:          ProductID("P-AMS.2D1216.2E02"),
+							Hardware2ProgramID: Hardware2ProgramID("HP-0019-21-D29E"),
+							Name:               "",
+							Address:            2,
+							ComObjects: []ComObjectInstanceRef{
+								ComObjectInstanceRef{
+									ComObjectRefID: ComObjectRefID("R-10000"),
+									ComObjectID:    ComObjectID("O-0"),
+									DatapointType:  "",
+									Links:          []string{"GA-1"},
+								},
+							},
+						},
+					}},
 				},
 			},
 		}
@@ -188,10 +225,10 @@ func TestVersion5_7_2_743(t *testing.T) {
 		}
 	})
 
-	if is, want := len(archive.ManufacturerFiles), 0; is != want {
+	if is, want := len(archive.ManufacturerFiles), 3; is != want {
 		t.Fatalf("%v != %v", is, want)
 	}
-	if is, want := len(archive.HardwareFiles), 0; is != want {
+	if is, want := len(archive.HardwareFiles), 2; is != want {
 		t.Fatalf("%v != %v", is, want)
 	}
 }
