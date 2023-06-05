@@ -2,7 +2,6 @@ package ets
 
 import (
 	"fmt"
-	"github.com/yeka/zip"
 	"io"
 	"io/ioutil"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/yeka/zip"
 )
 
 // InstallationFile is a file that contains zero or more project installations.

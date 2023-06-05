@@ -6,7 +6,7 @@ import (
 )
 
 func TestVersion5_7_2_743(t *testing.T) {
-	archive, err := OpenExportArchive("Testproject-5.7.5-1373.knxproj", "")
+	archive, err := OpenExportArchive("Testproject-5.knxproj", "testabcdefg")
 	if err != nil {
 		t.Fatal(err)
 	}

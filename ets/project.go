@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 )
 
@@ -42,7 +43,7 @@ func (pi *ProjectInfo) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace, schema20Namespace, schema21Namespace:
+	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace, schema20Namespace, schema21Namespace, schema22Namespace:
 		return d.DecodeElement((*projectInfo11)(pi), &start)
 
 	default:
@@ -204,6 +205,7 @@ type Project struct {
 
 // UnmarshalXML implements xml.Unmarshaler.
 func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	log.Println("Unmarshal XML")
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
@@ -213,7 +215,7 @@ func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	case schema20Namespace:
 		return d.DecodeElement((*project20)(p), &start)
 
-	case schema21Namespace:
+	case schema21Namespace, schema22Namespace:
 		return d.DecodeElement((*project21)(p), &start)
 
 	default:
