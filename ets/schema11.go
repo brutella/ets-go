@@ -543,8 +543,8 @@ type hardware2Program11 Hardware2Program
 
 func (hp *hardware2Program11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
-		ID      string `xml:"Id,attr"`
-		Element struct {
+		ID          string `xml:"Id,attr"`
+		ProgramRefs []struct {
 			RefID string `xml:"RefId,attr"`
 		} `xml:"ApplicationProgramRef"`
 	}
@@ -560,9 +560,12 @@ func (hp *hardware2Program11) UnmarshalXML(d *xml.Decoder, start xml.StartElemen
 		hp.ID = Hardware2ProgramID(ids[2])
 	}
 
-	refIds := strings.Split(doc.Element.RefID, "_")
-	if len(refIds) == 2 {
-		hp.ApplicationProgramID = ApplicationProgramID(refIds[1])
+	hp.ApplicationProgramIDs = make([]ApplicationProgramID, len(doc.ProgramRefs))
+	for i, ref := range doc.ProgramRefs {
+		refIds := strings.Split(ref.RefID, "_")
+		if len(refIds) == 2 {
+			hp.ApplicationProgramIDs[i] = ApplicationProgramID(refIds[1])
+		}
 	}
 
 	return nil

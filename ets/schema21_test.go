@@ -1,12 +1,13 @@
 package ets
 
 import (
-	"github.com/go-test/deep"
 	"testing"
+
+	"github.com/go-test/deep"
 )
 
 func TestVersion6_0(t *testing.T) {
-	archive, err := OpenExportArchive("Testproject.knxproj", "testabcdefg")
+	archive, err := OpenExportArchive("Testproject.knxproj", "cZZMPZALQGFmqdguE19tRaZeJ/L/Mp8GiogUi9vohSA=" /*"testabcdefg"*/)
 	if err != nil {
 		t.Fatal(err)
 	}

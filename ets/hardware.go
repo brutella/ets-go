@@ -36,10 +36,10 @@ type Product struct {
 
 type Hardware2ProgramID string
 type Hardware2Program struct {
-	ManufacturerID       ManufacturerID
-	HardwareID           HardwareID
-	ID                   Hardware2ProgramID
-	ApplicationProgramID ApplicationProgramID
+	ManufacturerID        ManufacturerID
+	HardwareID            HardwareID
+	ID                    Hardware2ProgramID
+	ApplicationProgramIDs []ApplicationProgramID
 }
 
 // HardwareID is the ID of a manufacturer.
