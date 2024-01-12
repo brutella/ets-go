@@ -145,10 +145,11 @@ type GroupAddressID string
 
 // GroupAddress is a group address.
 type GroupAddress struct {
-	ID        GroupAddressID
-	ProjectID ProjectID
-	Name      string
-	Address   uint16
+	ID            GroupAddressID
+	ProjectID     ProjectID
+	Name          string
+	Address       uint16
+	DatapointType string
 }
 
 // GroupRangeID is the ID of a group range.

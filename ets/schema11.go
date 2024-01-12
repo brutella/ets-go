@@ -230,9 +230,10 @@ func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		RangeStart   uint16 `xml:",attr"`
 		RangeEnd     uint16 `xml:",attr"`
 		GroupAddress []struct {
-			ID      string `xml:"Id,attr"`
-			Name    string `xml:",attr"`
-			Address uint16 `xml:",attr"`
+			ID            string `xml:"Id,attr"`
+			Name          string `xml:",attr"`
+			Address       uint16 `xml:",attr"`
+			DatapointType string `xml:",attr"`
 		}
 		GroupRange []groupRange11
 	}
@@ -248,17 +249,18 @@ func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	gar.Addresses = make([]GroupAddress, len(doc.GroupAddress))
 	gar.SubRanges = make([]GroupRange, len(doc.GroupRange))
 
-	for n, docGrpAddr := range doc.GroupAddress {
-		ids := strings.Split(docGrpAddr.ID, "_")
+	for n, ga := range doc.GroupAddress {
+		ids := strings.Split(ga.ID, "_")
 		if len(ids) != 2 {
-			return fmt.Errorf("Invalid GroupAddress Id %s", docGrpAddr.ID)
+			return fmt.Errorf("Invalid GroupAddress Id %s", ga.ID)
 		}
 
 		gar.Addresses[n] = GroupAddress{
-			ProjectID: ProjectID(ids[0]),
-			ID:        GroupAddressID(ids[1]),
-			Name:      docGrpAddr.Name,
-			Address:   docGrpAddr.Address,
+			ProjectID:     ProjectID(ids[0]),
+			ID:            GroupAddressID(ids[1]),
+			Name:          ga.Name,
+			Address:       ga.Address,
+			DatapointType: ga.DatapointType,
 		}
 	}
 
