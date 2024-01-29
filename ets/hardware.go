@@ -10,10 +10,8 @@ import (
 type TranslationRefID string
 
 type Translation struct {
-	ManufacturerID ManufacturerID
-	HardwareID     HardwareID
-	ProductID      ProductID
-	Text           string
+	RefID TranslationRefID
+	Texts map[string]string
 }
 
 // LanguageID is the ID of a language.

@@ -233,6 +233,7 @@ func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 			ID            string `xml:"Id,attr"`
 			Name          string `xml:",attr"`
 			Address       uint16 `xml:",attr"`
+			Description   string `xml:",attr"`
 			DatapointType string `xml:",attr"`
 		}
 		GroupRange []groupRange11
@@ -259,6 +260,7 @@ func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 			ProjectID:     ProjectID(ids[0]),
 			ID:            GroupAddressID(ids[1]),
 			Name:          ga.Name,
+			Description:   ga.Description,
 			Address:       ga.Address,
 			DatapointType: ga.DatapointType,
 		}
@@ -329,6 +331,42 @@ func (p *project11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
+type Ids struct {
+	Manufacturer ManufacturerID
+	AppProgram   ApplicationProgramID
+	Module       ModuleID
+	ComObject    ComObjectID
+	ComObjectRef ComObjectRefID
+}
+
+func parseIds(s string) Ids {
+	var ids Ids
+	for _, id := range strings.Split(s, "_") {
+		if len(id) == 0 {
+			continue
+		}
+
+		parts := strings.Split(id, "-")
+		if len(parts) < 2 {
+			continue
+		}
+
+		switch parts[0] {
+		case "M":
+			ids.Manufacturer = ManufacturerID(id)
+		case "A":
+			ids.AppProgram = ApplicationProgramID(id)
+		case "MD":
+			ids.Module = ModuleID(id)
+		case "O":
+			ids.ComObject = ComObjectID(id)
+		case "R":
+			ids.ComObjectRef = ComObjectRefID(id)
+		}
+	}
+	return ids
+}
+
 type comObject11 ComObject
 
 func (co *comObject11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
@@ -336,7 +374,6 @@ func (co *comObject11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		ID                string `xml:"Id,attr"`
 		Name              string `xml:",attr"`
 		Text              string `xml:",attr"`
-		Description       string `xml:",attr"`
 		FunctionText      string `xml:",attr"`
 		ObjectSize        string `xml:",attr"`
 		DatapointType     string `xml:",attr"`
@@ -352,18 +389,18 @@ func (co *comObject11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	if err := d.DecodeElement(&doc, &start); err != nil {
 		return err
 	}
+	ids := parseIds(doc.ID)
 
-	ids := strings.Split(doc.ID, "_")
-	if len(ids) != 3 {
+	if len(ids.Manufacturer) == 0 || len(ids.AppProgram) == 0 || len(ids.ComObject) == 0 {
 		return fmt.Errorf("Invalid ComObjectId %s", doc.ID)
 	}
 
-	co.ManufacturerID = ManufacturerID(ids[0])
-	co.ApplicationProgramID = ApplicationProgramID(ids[1])
-	co.ID = ComObjectID(ids[2])
+	co.ManufacturerID = ids.Manufacturer
+	co.ApplicationProgramID = ids.AppProgram
+	co.ID = ids.ComObject
+	co.ModuleID = ids.Module
 	co.Name = doc.Name
 	co.Text = doc.Text
-	co.Description = doc.Description
 	co.FunctionText = doc.FunctionText
 	co.ObjectSize = doc.ObjectSize
 	co.DatapointType = doc.DatapointType
@@ -383,71 +420,49 @@ type comObjectRef11 ComObjectRef
 // Id="M-0080_A-1012-10-5227-O00C5_O-0_R-1" RefId="M-0080_A-1012-10-5227-O00C5_O-0"
 func (cor *comObjectRef11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
-		ID                string  `xml:"Id,attr"`
-		RefID             string  `xml:"RefId,attr"`
-		Name              *string `xml:",attr"`
-		Text              *string `xml:",attr"`
-		Description       *string `xml:",attr"`
-		FunctionText      *string `xml:",attr"`
-		ObjectSize        *string `xml:",attr"`
-		DatapointType     *string `xml:",attr"`
-		Priority          *string `xml:",attr"`
-		ReadFlag          *string `xml:",attr"`
-		WriteFlag         *string `xml:",attr"`
-		CommunicationFlag *string `xml:",attr"`
-		TransmitFlag      *string `xml:",attr"`
-		UpdateFlag        *string `xml:",attr"`
-		ReadOnInitFlag    *string `xml:",attr"`
+		ID                string `xml:"Id,attr"`
+		RefID             string `xml:"RefId,attr"`
+		Name              string `xml:",attr"`
+		Text              string `xml:",attr"`
+		Description       string `xml:",attr"`
+		FunctionText      string `xml:",attr"`
+		ObjectSize        string `xml:",attr"`
+		DatapointType     string `xml:",attr"`
+		Priority          string `xml:",attr"`
+		ReadFlag          string `xml:",attr"`
+		WriteFlag         string `xml:",attr"`
+		CommunicationFlag string `xml:",attr"`
+		TransmitFlag      string `xml:",attr"`
+		UpdateFlag        string `xml:",attr"`
+		ReadOnInitFlag    string `xml:",attr"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
 		return err
 	}
-	ids := strings.Split(doc.ID, "_")
-	if len(ids) != 4 {
+
+	ids := parseIds(doc.ID)
+
+	if len(ids.Manufacturer) == 0 || len(ids.AppProgram) == 0 || len(ids.ComObject) == 0 || len(ids.ComObjectRef) == 0 {
 		return fmt.Errorf("Invalid ComObjectRefId %s", doc.ID)
 	}
-	cor.ManufacturerID = ManufacturerID(ids[0])
-	cor.ApplicationProgramID = ApplicationProgramID(ids[1])
-	cor.ComObjectID = ComObjectID(ids[2])
-	cor.ID = ComObjectRefID(ids[3])
+
+	cor.ManufacturerID = ids.Manufacturer
+	cor.ApplicationProgramID = ids.AppProgram
+	cor.ComObjectID = ids.ComObject
+	cor.ID = ids.ComObjectRef
 	cor.Name = doc.Name
 	cor.Text = doc.Text
-	cor.Description = doc.Description
 	cor.FunctionText = doc.FunctionText
 	cor.ObjectSize = doc.ObjectSize
 	cor.DatapointType = doc.DatapointType
 	cor.Priority = doc.Priority
-
-	if doc.ReadFlag != nil {
-		cor.ReadFlag = new(bool)
-		*cor.ReadFlag = *doc.ReadFlag == "Enabled"
-	}
-
-	if doc.WriteFlag != nil {
-		cor.WriteFlag = new(bool)
-		*cor.WriteFlag = *doc.WriteFlag == "Enabled"
-	}
-
-	if doc.CommunicationFlag != nil {
-		cor.CommunicationFlag = new(bool)
-		*cor.CommunicationFlag = *doc.CommunicationFlag == "Enabled"
-	}
-
-	if doc.TransmitFlag != nil {
-		cor.TransmitFlag = new(bool)
-		*cor.TransmitFlag = *doc.TransmitFlag == "Enabled"
-	}
-
-	if doc.UpdateFlag != nil {
-		cor.UpdateFlag = new(bool)
-		*cor.UpdateFlag = *doc.UpdateFlag == "Enabled"
-	}
-
-	if doc.ReadOnInitFlag != nil {
-		cor.ReadOnInitFlag = new(bool)
-		*cor.ReadOnInitFlag = *doc.ReadOnInitFlag == "Enabled"
-	}
+	cor.ReadFlag = doc.ReadFlag == "Enabled"
+	cor.WriteFlag = doc.WriteFlag == "Enabled"
+	cor.CommunicationFlag = doc.CommunicationFlag == "Enabled"
+	cor.TransmitFlag = doc.TransmitFlag == "Enabled"
+	cor.UpdateFlag = doc.UpdateFlag == "Enabled"
+	cor.ReadOnInitFlag = doc.ReadOnInitFlag == "Enabled"
 
 	return nil
 }
@@ -455,6 +470,7 @@ func (cor *comObjectRef11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) 
 type applicationProgram11 ApplicationProgram
 
 func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+
 	var doc struct {
 		ID      string `xml:"Id,attr"` // Id="M-0080_A-1012-10-5227-O00C5"
 		Name    string `xml:",attr"`
@@ -463,29 +479,42 @@ func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 			Objects    []comObject11    `xml:"ComObjectTable>ComObject"`
 			ObjectRefs []comObjectRef11 `xml:"ComObjectRefs>ComObjectRef"`
 		}
+		Modules []struct {
+			ID         string           `xml:"Id,attr"` // Id="M-0080_A-1012-10-5227-O00C5_MD-1"
+			Objects    []comObject11    `xml:"Static>ComObjects>ComObject"`
+			ObjectRefs []comObjectRef11 `xml:"Static>ComObjectRefs>ComObjectRef"`
+		} `xml:"ModuleDefs>ModuleDef"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
 		return err
 	}
 
-	ids := strings.Split(doc.ID, "_")
-	if len(ids) != 2 {
+	ids := parseIds(doc.ID)
+	if len(ids.Manufacturer) == 0 || len(ids.AppProgram) == 0 {
 		return fmt.Errorf("Invalid ApplicationProgram RefID %s", doc.ID)
 	}
 
-	ap.ManufacturerID = ManufacturerID(ids[0])
-	ap.ID = ApplicationProgramID(ids[1])
+	ap.ManufacturerID = ids.Manufacturer
+	ap.ID = ids.AppProgram
 	ap.Name = doc.Name
 	ap.Version = doc.Version
-	ap.Objects = make([]ComObject, len(doc.Static.Objects))
-	ap.ObjectRefs = make([]ComObjectRef, len(doc.Static.ObjectRefs))
 
-	for n, docComObj := range doc.Static.Objects {
+	comObjects := doc.Static.Objects
+	comObjectRefs := doc.Static.ObjectRefs
+	for _, module := range doc.Modules {
+		comObjects = append(comObjects, module.Objects[:]...)
+		comObjectRefs = append(comObjectRefs, module.ObjectRefs[:]...)
+	}
+
+	ap.Objects = make([]ComObject, len(comObjects))
+	ap.ObjectRefs = make([]ComObjectRef, len(comObjectRefs))
+
+	for n, docComObj := range comObjects {
 		ap.Objects[n] = ComObject(docComObj)
 	}
 
-	for n, docComObjRef := range doc.Static.ObjectRefs {
+	for n, docComObjRef := range comObjectRefs {
 		ap.ObjectRefs[n] = ComObjectRef(docComObjRef)
 	}
 
@@ -497,8 +526,9 @@ type manufacturerData11 ManufacturerData
 func (md *manufacturerData11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		Manufacturer struct {
-			ID       string                 `xml:"RefId,attr"`
-			Programs []applicationProgram11 `xml:"ApplicationPrograms>ApplicationProgram"`
+			ID        string                 `xml:"RefId,attr"`
+			Programs  []applicationProgram11 `xml:"ApplicationPrograms>ApplicationProgram"`
+			Languages []language11           `xml:"Languages>Language"`
 		} `xml:"ManufacturerData>Manufacturer"`
 	}
 
@@ -508,9 +538,13 @@ func (md *manufacturerData11) UnmarshalXML(d *xml.Decoder, start xml.StartElemen
 
 	md.ID = ManufacturerID(doc.Manufacturer.ID)
 	md.Programs = make([]ApplicationProgram, len(doc.Manufacturer.Programs))
-
 	for n, docProg := range doc.Manufacturer.Programs {
 		md.Programs[n] = ApplicationProgram(docProg)
+	}
+
+	md.Languages = make([]Language, len(doc.Manufacturer.Languages))
+	for n, docLang := range doc.Manufacturer.Languages {
+		md.Languages[n] = Language(docLang)
 	}
 
 	return nil
@@ -605,52 +639,44 @@ func (hw *hardware11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	return nil
 }
 
-type translation11 Translation
-
-func (tr *translation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var doc struct {
-		ID      string `xml:"RefId,attr"`
-		Element struct {
-			Text string `xml:"Text,attr"`
-		} `xml:"TranslationElement>Translation"`
-	}
-
-	if err := d.DecodeElement(&doc, &start); err != nil {
-		return err
-	}
-	ids := strings.Split(doc.ID, "_")
-	if len(ids) != 3 {
-		return fmt.Errorf("Invalid Translation RefId %s", doc.ID)
-	}
-
-	tr.ManufacturerID = ManufacturerID(ids[0])
-	tr.HardwareID = HardwareID(ids[1])
-	tr.ProductID = ProductID(ids[2])
-	tr.Text = doc.Element.Text
-
-	return nil
-}
-
 type language11 Language
 
 func (lang *language11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
-		Language struct {
-			ID           string          `xml:"Identifier,attr"`
-			Translations []translation11 `xml:"TranslationUnit"`
-		} `xml:"Language"`
+		ID   string `xml:"Identifier,attr"`
+		Unit []struct {
+			Elements []struct {
+				RefID        string `xml:"RefId,attr"`
+				Translations []struct {
+					Name string `xml:"AttributeName,attr"`
+					Text string `xml:"Text,attr"`
+				} `xml:"Translation"`
+			} `xml:"TranslationElement"`
+		} `xml:"TranslationUnit"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
 		return err
 	}
 
-	lang.ID = LanguageID(doc.Language.ID)
-	lang.Translations = make([]Translation, len(doc.Language.Translations))
+	lang.ID = LanguageID(doc.ID)
 
-	for n, tr := range doc.Language.Translations {
-		lang.Translations[n] = Translation(tr)
+	var ts []Translation
+	for _, u := range doc.Unit {
+		for _, e := range u.Elements {
+			texts := map[string]string{}
+			for _, t := range e.Translations {
+				texts[t.Name] = t.Text
+			}
+			t := Translation{
+				RefID: TranslationRefID(e.RefID),
+				Texts: texts,
+			}
+			ts = append(ts, t)
+		}
 	}
+
+	lang.Translations = ts
 
 	return nil
 }
@@ -662,7 +688,7 @@ func (md *hardwareData11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 		Manufacturer struct {
 			ID        string       `xml:"RefId,attr"`
 			Hardwares []hardware11 `xml:"Hardware"`
-			Languages []language11 `xml:"Languages"`
+			Languages []language11 `xml:"Languages>Language"`
 		} `xml:"ManufacturerData>Manufacturer"`
 	}
 

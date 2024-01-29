@@ -14,6 +14,7 @@ type ComObject struct {
 	ID                   ComObjectID
 	ApplicationProgramID ApplicationProgramID
 	ManufacturerID       ManufacturerID
+	ModuleID             ModuleID
 	Name                 string
 	Text                 string
 	Description          string
@@ -35,19 +36,19 @@ type ComObjectRef struct {
 	ComObjectID          ComObjectID
 	ApplicationProgramID ApplicationProgramID
 	ManufacturerID       ManufacturerID
-	Name                 *string
-	Text                 *string
-	Description          *string
-	FunctionText         *string
-	ObjectSize           *string
-	DatapointType        *string
-	Priority             *string
-	ReadFlag             *bool
-	WriteFlag            *bool
-	CommunicationFlag    *bool
-	TransmitFlag         *bool
-	UpdateFlag           *bool
-	ReadOnInitFlag       *bool
+	Name                 string
+	Text                 string
+	Description          string
+	FunctionText         string
+	ObjectSize           string
+	DatapointType        string
+	Priority             string
+	ReadFlag             bool
+	WriteFlag            bool
+	CommunicationFlag    bool
+	TransmitFlag         bool
+	UpdateFlag           bool
+	ReadOnInitFlag       bool
 }
 
 // ApplicationProgramID is the ID of an application program.
@@ -63,13 +64,16 @@ type ApplicationProgram struct {
 	ObjectRefs     []ComObjectRef
 }
 
+type ModuleID string
+
 // ManufacturerID is the ID of a manufacturer.
 type ManufacturerID string
 
 // ManufacturerData contains manufacturer-specific data.
 type ManufacturerData struct {
-	ID       ManufacturerID
-	Programs []ApplicationProgram
+	ID        ManufacturerID
+	Programs  []ApplicationProgram
+	Languages []Language
 }
 
 // UnmarshalXML implements xml.Unmarshaler.

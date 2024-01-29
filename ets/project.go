@@ -148,6 +148,7 @@ type GroupAddress struct {
 	ID            GroupAddressID
 	ProjectID     ProjectID
 	Name          string
+	Description   string
 	Address       uint16
 	DatapointType string
 }
