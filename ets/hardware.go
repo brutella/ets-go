@@ -62,7 +62,7 @@ func (md *HardwareData) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace, schema20Namespace, schema21Namespace, schema22Namespace:
+	case schema11Namespace, schema12Namespace, schema13Namespace, schema14Namespace, schema20Namespace, schema21Namespace, schema22Namespace, schema23Namespace:
 		return d.DecodeElement((*hardwareData11)(md), &start)
 
 	default:
