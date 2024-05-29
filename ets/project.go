@@ -94,10 +94,16 @@ func (s ComObjectRefID) IDs() (m string, ap string, o string, r string) {
 
 // ComObjectInstanceRef connects a communication object reference with zero or more group addresses.
 type ComObjectInstanceRef struct {
-	ComObjectRefID ComObjectRefID
-	ComObjectID    ComObjectID
-	DatapointType  string
-	Links          []string
+	ComObjectRefID    ComObjectRefID
+	ComObjectID       ComObjectID
+	DatapointType     string
+	Links             []string
+	ReadFlag          bool
+	WriteFlag         bool
+	CommunicationFlag bool
+	TransmitFlag      bool
+	UpdateFlag        bool
+	ReadOnInitFlag    bool
 }
 
 // DeviceInstanceID is the ID of a device instance.

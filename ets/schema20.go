@@ -18,9 +18,15 @@ func (di *deviceInstance20) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		Name       string `xml:",attr"`
 		Address    uint16 `xml:",attr"`
 		ComObjects []struct {
-			RefID         string `xml:"RefId,attr"`
-			DatapointType string `xml:",attr"`
-			Links         string `xml:"Links,attr"`
+			RefID             string `xml:"RefId,attr"`
+			DatapointType     string `xml:",attr"`
+			Links             string `xml:",attr"`
+			ReadFlag          string `xml:",attr"`
+			WriteFlag         string `xml:",attr"`
+			CommunicationFlag string `xml:",attr"`
+			TransmitFlag      string `xml:",attr"`
+			UpdateFlag        string `xml:",attr"`
+			ReadOnInitFlag    string `xml:",attr"`
 		} `xml:"ComObjectInstanceRefs>ComObjectInstanceRef"`
 	}
 
@@ -67,10 +73,16 @@ func (di *deviceInstance20) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		}
 
 		comObj := ComObjectInstanceRef{
-			ComObjectID:    comObjID,
-			ComObjectRefID: comObjRefID,
-			DatapointType:  docComObj.DatapointType,
-			Links:          make([]string, 0),
+			ComObjectID:       comObjID,
+			ComObjectRefID:    comObjRefID,
+			DatapointType:     docComObj.DatapointType,
+			Links:             make([]string, 0),
+			ReadFlag:          docComObj.ReadFlag == "Enabled",
+			WriteFlag:         docComObj.WriteFlag == "Enabled",
+			CommunicationFlag: docComObj.CommunicationFlag == "Enabled",
+			TransmitFlag:      docComObj.TransmitFlag == "Enabled",
+			UpdateFlag:        docComObj.UpdateFlag == "Enabled",
+			ReadOnInitFlag:    docComObj.ReadOnInitFlag == "Enabled",
 		}
 
 		links := strings.Split(docComObj.Links, " ")
